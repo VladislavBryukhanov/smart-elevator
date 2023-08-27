@@ -29,7 +29,7 @@ export const Building = () => {
         <ShellElevator
           key={floorNumber}
           onClick={() => {
-            const elevatorId = findBestLocatedElevator(queuedFloors);
+            const elevatorId = findBestLocatedElevator(queuedFloors, activeFloors, floorNumber);
             dispatch(pushTargetFloor({elevatorId, floorNumber}))
           }}
         >
