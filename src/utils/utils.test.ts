@@ -80,5 +80,35 @@ describe('findBestLocatedElevator', () => {
         4
       )
     ).toEqual('1234');
+
+    expect(
+      findBestLocatedElevator(
+        {
+          '0': [],
+          '1000': [],
+          '2000': [1]
+        },
+        {
+          '0': 5,
+          '1000': 8,
+          '2000': 1
+        },
+        7
+      )
+    ).toEqual('1000');
+
+    expect(
+      findBestLocatedElevator(
+        {
+          '0': [],
+          '1000': [],
+        },
+        {
+          '0': 7,
+          '1000': 5,
+        },
+        4
+      )
+    ).toEqual('1000');
   });
 })

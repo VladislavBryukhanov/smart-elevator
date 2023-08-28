@@ -5,13 +5,17 @@ export const findBestLocatedElevator = (
   activeFloors: Record<string, number>,
   targetFloor: number,
 ) => {
-  const [[initElevatorId, initFloorsList]] = Object.entries(queuedFloors);
+  const queuedFloorsArray = Object.entries(queuedFloors);
+  const [[initElevatorId, initFloorsList]] = queuedFloorsArray;
 
-  const {elevatorId: leastQueuedElevatorId, isEqual} = Object.entries(queuedFloors)
+  const concurrentElevators = queuedFloorsArray.filter(([elevatorIdA, floorsA]) =>
+    queuedFloorsArray.some(
+      ([elevatorIdB, floorsB]) => elevatorIdA !== elevatorIdB && floorsA.length === floorsB.length
+    )
+  );
+  
+  const {elevatorId: leastQueuedElevatorId} = queuedFloorsArray
     .reduce((acc, [elevatorId, floors]) => {
-      if (acc.prevFloorsLength !== floors.length) {
-        acc.isEqual = false;
-      }
       if (floors.length < acc.minFloorsLength) {
         acc.elevatorId = elevatorId;
         acc.minFloorsLength = floors.length;
@@ -20,17 +24,20 @@ export const findBestLocatedElevator = (
 
       return acc;
     }, {
-      elevatorId: initElevatorId,
+      elevatorId: '',
       prevFloorsLength: initFloorsList.length,
       minFloorsLength: MAX_FLOOR,
-      isEqual: true
     });
 
-  if (!isEqual && leastQueuedElevatorId) {
+  const [[, concurrentFloors] = []]= concurrentElevators;
+
+  if (leastQueuedElevatorId && (
+    !concurrentElevators.length || queuedFloors[leastQueuedElevatorId].length < concurrentFloors!.length
+  )) {
     return leastQueuedElevatorId;
   }
 
-  const {elevatorId: nearestElevatorId} = Object.entries(queuedFloors)
+  const {elevatorId: nearestElevatorId} = concurrentElevators
     .reduce((acc, [elevatorId, floors]) => {
       const floorsDiff = calculateQueuedFloorsDiff(activeFloors[elevatorId], [...floors, targetFloor]);
 
